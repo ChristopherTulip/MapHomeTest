@@ -132,7 +132,7 @@ public class MainActivity extends SherlockFragmentActivity {
 			
 			final RoutesSerializer route = response.routes.get(0);	
 			final LegSerializer leg = route.legs.get(0);
-			
+			//process the data
 			double tripCost = Constant.BASE_FARE + Constant.COST_PER_M * leg.distance.value + Constant.COST_PER_SECOND * leg.duration.value;
 			tripCost = Util.round(tripCost, 2);
 			
@@ -147,6 +147,7 @@ public class MainActivity extends SherlockFragmentActivity {
 			
 			LatLng endlocation = new LatLng(leg.end_location.lat, leg.end_location.lng);
 			
+			//update the UI
 			cost.setText("$".concat(String.valueOf(tripCost)));
 			distance.setText(leg.distance.text);
 			time.setText(leg.duration.text);

@@ -34,6 +34,8 @@ public class TaxiMapFragment extends SupportMapFragment implements LocationListe
 	private LatLng endLocation;
 	
 	private Polyline mCurrentRoute;
+
+	private boolean locationFound = false;
 	
 	public LatLng getStartLocation() {
 		return startLocation;
@@ -54,8 +56,19 @@ public class TaxiMapFragment extends SupportMapFragment implements LocationListe
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) 
 	{
+		super.onActivityCreated(savedInstanceState);
+		
 		locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 60, this);
+		
+		Location location = null;
+		if (savedInstanceState != null) 
+		{
+			locationFound = savedInstanceState.getBoolean("locationFound");
+			location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			
+			if (location != null && locationFound == true) onLocationChanged(location);
+		}
 		
 	    getMap().setOnMapLongClickListener(new OnMapLongClickListener() 
 	    {
@@ -68,7 +81,14 @@ public class TaxiMapFragment extends SupportMapFragment implements LocationListe
 			}
 		});
 	    
-		super.onActivityCreated(savedInstanceState);
+		
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) 
+	{
+		outState.putBoolean("locationFound", false);
+		super.onSaveInstanceState(outState);
 	}
 	
 	@Override
@@ -79,18 +99,24 @@ public class TaxiMapFragment extends SupportMapFragment implements LocationListe
 	}
 	
 	@Override
-	public void onLocationChanged(Location location) {
-		double lat = location.getLatitude();
-		double lng = location.getLongitude();
+	public void onLocationChanged(final Location location) {
 		
-		startLocation = new LatLng(lat, lng);
+		if (getMap() != null)
+		{
+			double lat = location.getLatitude();
+			double lng = location.getLongitude();
+			
+			startLocation = new LatLng(lat, lng);
+			
+			getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+			
+			if (me_marker == null)	me_marker = getMap().addMarker(new MarkerOptions().position(startLocation));
+			else me_marker.setPosition(startLocation);
+			
+			locationFound  = true;
+			locationManager.removeUpdates(this);
+		}
 		
-		getMap().moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
-		
-		if (me_marker == null)	me_marker = getMap().addMarker(new MarkerOptions().position(startLocation));
-		else me_marker.setPosition(startLocation);
-		
-		locationManager.removeUpdates(this);
 	}
 
 	@Override
