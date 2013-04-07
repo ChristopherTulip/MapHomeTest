@@ -1,6 +1,5 @@
 package com.tulip.maphometest.Utils;
 
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,11 +35,10 @@ public class Util {
 	public static void restartLoader(LoaderManager lm, int id, Bundle args, LoaderCallbacks<? extends ResponseObject> mLoaderCallbacks)
 	{
 		if (lm.getLoader(id) != null) lm.restartLoader(id, args, mLoaderCallbacks);
-        
         else lm.restartLoader(id, args, mLoaderCallbacks);
 	}
 	
-	public static String buildMapsAPIUrl (String startLocation, String endLocation)
+	public static String buildMapsAPIUrl (String startLocation, String endLocation, String region)
 	{
 		String url = Constant.MAP_API_URL_BASE;
 		
@@ -95,8 +93,6 @@ public class Util {
 		}
 		return out;
 	}
-	
-	
 	
 	public static double round(double unrounded, int precision)
 	{

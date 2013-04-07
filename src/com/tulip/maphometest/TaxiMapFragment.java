@@ -1,9 +1,14 @@
 package com.tulip.maphometest;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -20,6 +25,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.tulip.maphometest.Utils.Logger;
 
 public class TaxiMapFragment extends SupportMapFragment implements LocationListener
 {
@@ -34,15 +40,11 @@ public class TaxiMapFragment extends SupportMapFragment implements LocationListe
 	private LatLng endLocation;
 	
 	private Polyline mCurrentRoute;
-
+		
 	private boolean locationFound = false;
 	
-	public LatLng getStartLocation() {
-		return startLocation;
-	}
-	public LatLng getEndLocation() {
-		return endLocation;
-	}
+	public LatLng getStartLocation() {	return startLocation; }
+	public LatLng getEndLocation() { return endLocation; }
 	
 	public void setEndLocation(LatLng endLocation) {
 		this.endLocation = endLocation;
@@ -80,8 +82,6 @@ public class TaxiMapFragment extends SupportMapFragment implements LocationListe
 				else end_marker.setPosition(touch);
 			}
 		});
-	    
-		
 	}
 	
 	@Override
@@ -99,8 +99,8 @@ public class TaxiMapFragment extends SupportMapFragment implements LocationListe
 	}
 	
 	@Override
-	public void onLocationChanged(final Location location) {
-		
+	public void onLocationChanged(final Location location) 
+	{
 		if (getMap() != null)
 		{
 			double lat = location.getLatitude();

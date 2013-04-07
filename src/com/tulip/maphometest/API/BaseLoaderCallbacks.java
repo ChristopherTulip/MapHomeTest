@@ -42,7 +42,6 @@ public abstract class BaseLoaderCallbacks<T extends ResponseObject> implements L
 		}
 		else
 		{
-			
 			LoaderFailed(response);
 		}
 	}

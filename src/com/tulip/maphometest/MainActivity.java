@@ -1,10 +1,14 @@
 package com.tulip.maphometest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -25,11 +29,15 @@ import com.tulip.maphometest.API.DirectionsSerializer;
 import com.tulip.maphometest.API.LegSerializer;
 import com.tulip.maphometest.API.RoutesSerializer;
 import com.tulip.maphometest.API.StepSerializer;
+import com.tulip.maphometest.Utils.AndroidUtil;
 import com.tulip.maphometest.Utils.Constant;
+import com.tulip.maphometest.Utils.Logger;
 import com.tulip.maphometest.Utils.Util;
 
 public class MainActivity extends SherlockFragmentActivity {
     
+	protected static final String TAG = MainActivity.class.getSimpleName();
+
 	private SearchView searchView;
 	
 	private BaseLoaderCallbacks<DirectionsSerializer> mLoaderCallbacks;
@@ -38,6 +46,10 @@ public class MainActivity extends SherlockFragmentActivity {
 	private TextView distance;
 	private TextView time;
 	private ProgressDialog myDialog;
+	
+	private String mRegion= "AU";
+
+	protected String mState;
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +68,6 @@ public class MainActivity extends SherlockFragmentActivity {
         // Initialize the location fields
 	    if (getSupportLoaderManager().getLoader(Constant.GOOGLE_MAPS_LOADER_ID)!=null) 
         {
-	    	
         	Bundle args = new Bundle();
         	args.putString(Constant.URL_KEY, "");
         	Util.connectToLoader(getSupportLoaderManager(), Constant.GOOGLE_MAPS_LOADER_ID, args, mLoaderCallbacks);
@@ -77,12 +88,33 @@ public class MainActivity extends SherlockFragmentActivity {
         searchView.setOnQueryTextListener(new OnQueryTextListener() {
 			
 			@Override
-			public boolean onQueryTextSubmit(String query) {
+			public boolean onQueryTextSubmit(String query) 
+			{
 				LatLng startLocation = getTaxiMapFragment().getStartLocation();
+				
+				if (mState == null) 
+				{
+					try {
+						Geocoder geo = new Geocoder(MainActivity.this, Locale.getDefault());
+						Address addy = geo.getFromLocation(startLocation.latitude,
+								startLocation.longitude, 1).get(0);
+						mState = addy.getAdminArea();
+						mRegion = addy.getCountryCode();
+						
+						query = query.concat(", "  + mState);
+						
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				Logger.e(TAG, query);
+				
+				showProgressDialog();
 				
 				String url = Util.buildMapsAPIUrl(
 						startLocation.latitude+","+startLocation.longitude,
-						query);				
+						query, mRegion);				
 				
 				Bundle args = new Bundle();
 		        args.putString(Constant.URL_KEY, url);
@@ -94,8 +126,6 @@ public class MainActivity extends SherlockFragmentActivity {
 		        		mLoaderCallbacks
 		        		);
 		        
-		        showProgressDialog();
-				
 				return true;
 			}
 			
@@ -133,7 +163,10 @@ public class MainActivity extends SherlockFragmentActivity {
 			final RoutesSerializer route = response.routes.get(0);	
 			final LegSerializer leg = route.legs.get(0);
 			//process the data
-			double tripCost = Constant.BASE_FARE + Constant.COST_PER_M * leg.distance.value + Constant.COST_PER_SECOND * leg.duration.value;
+			double tripCost = Constant.BASE_FARE +
+					Constant.COST_PER_M * leg.distance.value + 
+					Constant.COST_PER_SECOND * leg.duration.value;
+			
 			tripCost = Util.round(tripCost, 2);
 			
 			List<LatLng> routePolyline = new ArrayList<LatLng>();
@@ -156,8 +189,7 @@ public class MainActivity extends SherlockFragmentActivity {
 			getTaxiMapFragment().setEndLocation(endlocation);
 			getTaxiMapFragment().setMapBounds(northeast, southwest);
 			
-			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+			
 		}
 
 		@Override
@@ -165,6 +197,9 @@ public class MainActivity extends SherlockFragmentActivity {
 			if (myDialog != null) myDialog.dismiss();
 			
 			Toast.makeText(MainActivity.this, "Error loading data: " + response.status, Toast.LENGTH_SHORT).show();
+			
+			AndroidUtil.hideSoftInput(MainActivity.this, searchView);
+	        cost.requestFocus();
 		}
     }
     
@@ -176,11 +211,12 @@ public class MainActivity extends SherlockFragmentActivity {
 			LatLng endLocation = getTaxiMapFragment().getEndLocation();
 			LatLng startLocation = getTaxiMapFragment().getStartLocation();
 			
-			if (endLocation != null)
-			{
+			if (endLocation != null && startLocation != null)
+			{	
 				String url = Util.buildMapsAPIUrl(
 						startLocation.latitude+","+startLocation.longitude,
-						endLocation.latitude+","+endLocation.longitude);
+						endLocation.latitude+","+endLocation.longitude,
+						mRegion);
 				
 				Bundle args = new Bundle();
 		        args.putString(Constant.URL_KEY, url);

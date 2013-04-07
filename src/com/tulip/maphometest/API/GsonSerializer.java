@@ -14,12 +14,6 @@ public class GsonSerializer
 	{
 		Gson serializer = new Gson();
 		
-		response = response.replaceAll("\\{\\n", "{");
-		response = response.replaceAll("\\}\\n", "}");
-		response = response.replaceAll("\\[\\n", "[");
-		response = response.replaceAll("\\]\\n", "]");
-		response = response.replaceAll("\\,\\n", ",");
-		
 		try 
 		{
 			return serializer.fromJson(response, t.getClass());
