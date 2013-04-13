@@ -29,10 +29,10 @@ import com.tulip.maphometest.API.DirectionsSerializer;
 import com.tulip.maphometest.API.LegSerializer;
 import com.tulip.maphometest.API.RoutesSerializer;
 import com.tulip.maphometest.API.StepSerializer;
-import com.tulip.maphometest.Utils.AndroidUtil;
 import com.tulip.maphometest.Utils.Constant;
 import com.tulip.maphometest.Utils.Logger;
 import com.tulip.maphometest.Utils.Util;
+import com.tulip.taxiguestimator.R;
 
 public class MainActivity extends SherlockFragmentActivity {
     
@@ -94,7 +94,8 @@ public class MainActivity extends SherlockFragmentActivity {
 				
 				if (mState == null) 
 				{
-					try {
+					try 
+					{
 						Geocoder geo = new Geocoder(MainActivity.this, Locale.getDefault());
 						Address addy = geo.getFromLocation(startLocation.latitude,
 								startLocation.longitude, 1).get(0);
@@ -106,6 +107,10 @@ public class MainActivity extends SherlockFragmentActivity {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+				}
+				else
+				{
+					query = query.concat(", "  + mState);
 				}
 				
 				Logger.e(TAG, query);
@@ -189,6 +194,7 @@ public class MainActivity extends SherlockFragmentActivity {
 			getTaxiMapFragment().setEndLocation(endlocation);
 			getTaxiMapFragment().setMapBounds(northeast, southwest);
 			
+			((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(searchView.getWindowToken(), 0);
 			
 		}
 
@@ -198,8 +204,8 @@ public class MainActivity extends SherlockFragmentActivity {
 			
 			Toast.makeText(MainActivity.this, "Error loading data: " + response.status, Toast.LENGTH_SHORT).show();
 			
-			AndroidUtil.hideSoftInput(MainActivity.this, searchView);
 	        cost.requestFocus();
+			
 		}
     }
     
@@ -252,4 +258,5 @@ public class MainActivity extends SherlockFragmentActivity {
     private TaxiMapFragment getTaxiMapFragment() {
 		return (TaxiMapFragment) getSupportFragmentManager().findFragmentByTag(Constant.TAXI_FRAGMENT_ID);
 	}
+	
 }

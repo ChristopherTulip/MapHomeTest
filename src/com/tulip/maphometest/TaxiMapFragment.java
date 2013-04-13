@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.tulip.maphometest.Utils.Logger;
+import com.tulip.taxiguestimator.R;
 
 public class TaxiMapFragment extends SupportMapFragment implements LocationListener
 {

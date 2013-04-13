@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package com.tulip.maphometest;
+package com.tulip.taxiguestimator;
 
 public final class Manifest {
     public static final class permission {
