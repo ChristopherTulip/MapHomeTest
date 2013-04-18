@@ -11,9 +11,14 @@ public class Constant {
 	public static final int GOOGLE_MAPS_LOADER_ID = 0;
 
 	public static final String TAXI_FRAGMENT_ID = "taxi_fragment";
-
-	public static final double BASE_FARE = 3.15;
-	public static final double COST_PER_M = 0.002568;
-	public static final double COST_PER_SECOND = 0.0154;
+	//Sydney Australia
+	//public static final double BASE_FARE = 3.15;
+	//public static final double COST_PER_M = 0.002568;
+	//public static final double COST_PER_SECOND = 0.0154;
+	
+	//Vancouver Canada
+	public static final double BASE_FARE = 3.50;
+	public static final double COST_PER_M = 0.00148;
+	public static final double COST_PER_SECOND = 0.005;
 	
 }
